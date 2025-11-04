@@ -5,6 +5,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 from agents.parse_agent import parse_log_text
+from docking_logic import process_docking_request
+from docking_rules import DOCKING_PORTS
 import PyPDF2
 
 # Load environment variables from .env file
@@ -63,48 +65,83 @@ def extract_text_from_file(file, filename: str) -> str:
     else:
         raise ValueError(f"Unsupported file type: {file_ext}")
 
-@app.route('/api/parse-logs', methods=['POST'])
-def parse_logs_endpoint():
+def serialize_schedule():
     """
-    Parse log files and extract structured mission data.
-    Accepts .txt, .pdf, and .csv files and uses AI to normalize the data.
+    Convert DOCKING_PORTS schedule to JSON-serializable format.
 
     Returns:
-        JSON with parsed mission data or error message
+        Dictionary with ports and their missions (datetime converted to ISO strings)
     """
-    # Check if files were uploaded
-    if 'files' not in request.files:
-        return jsonify({'error': 'No files provided'}), 400
+    serialized = {}
+    for port, missions in DOCKING_PORTS.items():
+        serialized[port] = [
+            {
+                'mission_id': m['mission_id'],
+                'start_time': m['start_time'].isoformat() + 'Z',
+                'end_time': m['end_time'].isoformat() + 'Z',
+                'team': m['team']
+            }
+            for m in missions
+        ]
+    return serialized
 
-    files = request.files.getlist('files')
-    results = []
+@app.route('/api/process-mission', methods=['POST'])
+def process_mission_endpoint():
+    """
+    Parse mission log file and automatically process docking request.
+    One-click processing: upload file -> parse -> dock -> return result.
 
-    for file in files:
-        # Skip invalid files
-        if file.filename == '' or not file.filename.lower().endswith(('.txt', '.pdf', '.csv')):
-            continue
+    Accepts .txt, .pdf, and .csv files and uses AI to normalize the data,
+    then immediately processes the docking request.
 
-        try:
-            # Extract text based on file type
-            file.seek(0)
-            log_content = extract_text_from_file(file, file.filename)
+    Returns:
+        JSON with parsed mission data and docking result
+    """
+    # Check if file was uploaded
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
 
-            if not log_content.strip():
-                continue
+    file = request.files['file']
 
-            # Parse the log using AI agent
-            parsed_data = parse_log_text(log_content)
+    # Validate file
+    if file.filename == '' or not file.filename.lower().endswith(('.txt', '.pdf', '.csv')):
+        return jsonify({'error': 'Invalid file type. Supported: .txt, .pdf, .csv'}), 400
 
-            results.append({
-                'filename': file.filename,
-                'data': parsed_data
-            })
+    try:
+        # Step 1: Extract text from file
+        file.seek(0)
+        log_content = extract_text_from_file(file, file.filename)
 
-        except Exception:
-            # Skip files that fail to parse
-            continue
+        if not log_content.strip():
+            return jsonify({'error': 'File is empty'}), 400
 
-    return jsonify({'results': results}), 200
+        # Step 2: Parse the log using AI agent
+        parsed_data = parse_log_text(log_content)
+
+        # Step 3: Automatically process docking request
+        docking_result = process_docking_request(parsed_data)
+
+        # Step 4: Return combined result
+        return jsonify({
+            'filename': file.filename,
+            'parsed_data': parsed_data,
+            'docking_result': docking_result
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': f'Failed to process mission: {str(e)}'}), 500
+
+@app.route('/api/docking-status', methods=['GET'])
+def get_docking_status():
+    """
+    Get current docking schedule for all ports.
+
+    Returns:
+        JSON with all ports and their scheduled missions
+    """
+    return jsonify({
+        'ports': serialize_schedule()
+    }), 200
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 8000))
