@@ -143,6 +143,26 @@ def get_docking_status():
         'ports': serialize_schedule()
     }), 200
 
+@app.route('/api/clear-schedule', methods=['POST'])
+def clear_schedule():
+    """
+    Clear all missions from the docking schedule.
+
+    Returns:
+        JSON with success message
+    """
+    try:
+        # Clear all ports by resetting them to empty lists
+        for port in DOCKING_PORTS:
+            DOCKING_PORTS[port] = []
+
+        return jsonify({
+            'message': 'Schedule cleared successfully',
+            'ports': serialize_schedule()
+        }), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to clear schedule: {str(e)}'}), 500
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 8000))
     app.run(debug=True, port=port)

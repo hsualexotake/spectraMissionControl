@@ -13,13 +13,6 @@
   text-align: center;
 }
 
-.subtitle {
-  color: #888;
-  margin-top: 0;
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
 .container {
   display: flex;
   flex-direction: column;
@@ -30,126 +23,11 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.input-section,
-.output-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  text-align: left;
-}
-
-.output-section h2 {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-label {
-  font-weight: 500;
-}
-
-.summarize-btn {
-  padding: 1rem 2.5rem;
-  font-size: 1.1rem;
-  font-weight: 500;
-  background-color: #646cff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  align-self: center;
-  min-width: 200px;
-}
-
-.summarize-btn:hover:not(:disabled) {
-  background-color: #535bf2;
-}
-
-.summarize-btn:disabled {
-  background-color: #444;
-  cursor: not-allowed;
-}
-
 .error {
   padding: 1rem;
   background-color: #ff4444;
   color: white;
   border-radius: 8px;
-}
-
-/* File Input */
-.file-input {
-  padding: 0.75rem;
-  border: 2px dashed #444;
-  border-radius: 8px;
-  background-color: #1a1a1a;
-  color: #fff;
-  cursor: pointer;
-  transition: border-color 0.3s;
-}
-
-.file-input:hover {
-  border-color: #646cff;
-}
-
-.file-input:focus {
-  outline: none;
-  border-color: #646cff;
-}
-
-/* File List */
-.file-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.file-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background-color: #1a1a1a;
-  border: 1px solid #444;
-  border-radius: 8px;
-}
-
-.file-name {
-  flex: 1;
-  font-weight: 500;
-}
-
-.file-size {
-  color: #888;
-  font-size: 0.875rem;
-}
-
-.remove-btn {
-  padding: 0.25rem 0.5rem;
-  background-color: #ff4444;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-}
-
-.remove-btn:hover {
-  background-color: #ff3333;
-}
-
-.result-item {
-  padding: 1rem;
-  background-color: #1a1a1a;
-  border: 1px solid #444;
-  border-radius: 8px;
-}
-
-.result-filename {
-  margin: 0 0 0.75rem 0;
-  color: #646cff;
-  font-size: 1.125rem;
 }
 
 /* JSON Output */
@@ -185,115 +63,248 @@ label {
   background: #555;
 }
 
-/* Docking Result Banner */
-.docking-result {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-}
-
-.docking-result.accepted {
-  background-color: #1a3a1a;
-  border: 2px solid #4caf50;
-}
-
-.docking-result.rejected {
-  background-color: #3a1a1a;
-  border: 2px solid #ff4444;
-}
-
-.docking-result .status-icon {
-  font-size: 3rem;
-  line-height: 1;
-}
-
-.docking-result .status-text {
-  flex: 1;
-}
-
-.docking-result .status-text strong {
-  display: block;
-  font-size: 1.25rem;
-  margin-bottom: 0.25rem;
-}
-
-.docking-result .status-text p {
-  margin: 0;
-  color: #ccc;
-}
-
-/* Schedule Grid */
-.schedule-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1rem;
-  max-width: 100%;
-}
-
-.port-schedule {
-  padding: 1rem;
-  background-color: #1a1a1a;
-  border: 1px solid #444;
-  border-radius: 8px;
-}
-
-.port-schedule h3 {
-  margin: 0 0 1rem 0;
-  color: #646cff;
-  font-size: 1.25rem;
-  text-align: center;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #444;
-}
-
-.empty-port {
-  text-align: center;
-  color: #888;
-  font-style: italic;
-  padding: 1rem 0;
-}
-
-.missions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.mission-card {
-  padding: 0.75rem;
-  background-color: #0d0d0d;
-  border: 1px solid #333;
-  border-radius: 6px;
-  font-size: 0.875rem;
-}
-
-.mission-card > div {
-  margin-bottom: 0.25rem;
-}
-
-.mission-card > div:last-child {
-  margin-bottom: 0;
-}
-
-.mission-time {
-  color: #a9dc76;
-  font-family: 'Courier New', Courier, monospace;
-}
-
-.mission-team {
-  color: #888;
-}
-
 /* Schedule Section */
 .schedule-section {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   width: 100%;
+}
+
+/* Mission Logs Header */
+.mission-logs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.mission-logs-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.choose-files-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: #2a2a2a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.choose-files-btn:hover {
+  background-color: #333;
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.file-chosen-text {
+  color: #888;
+  font-size: 0.875rem;
+}
+
+.parse-files-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.parse-files-btn:hover:not(:disabled) {
+  background-color: #535bf2;
+}
+
+.parse-files-btn:disabled {
+  background-color: #444;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.refresh-btn-new {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: #2a2a2a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.refresh-btn-new:hover {
+  background-color: #333;
+}
+
+.clear-all-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: #2a2a2a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.clear-all-btn:hover:not(:disabled) {
+  background-color: #ef4444;
+}
+
+.clear-all-btn:disabled {
+  background-color: #1a1a1a;
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* Mission Table */
+.mission-table-container {
+  margin-top: 1.5rem;
+}
+
+.mission-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.mission-table thead {
+  background-color: transparent;
+}
+
+.mission-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mission-table th.arrow-column {
+  width: 50px;
+  padding: 0.75rem 0.5rem;
+}
+
+.mission-table tbody tr.mission-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.2s;
+}
+
+.mission-table tbody tr.mission-row:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.mission-table td {
+  padding: 0.75rem 1rem;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.mission-table td.arrow-column {
+  width: 50px;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+}
+
+.expand-arrow {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  font-size: 0.875rem;
+}
+
+.expand-arrow:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.arrow-right,
+.arrow-down {
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+/* Expanded Row */
+.expanded-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.expanded-content {
+  padding: 0 !important;
+  background-color: #141414;
+}
+
+.expanded-inner {
+  padding: 1rem 1.5rem;
+}
+
+.expanded-header {
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 0.875rem;
+}
+
+.expanded-json-section h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-valid {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-invalid {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.table-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
 }
 
 /* Responsive Design */
