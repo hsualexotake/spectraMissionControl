@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import DockingCalendar from './components/DockingCalendar'
 
 interface MissionData {
   mission_id: string
@@ -22,24 +23,12 @@ interface ProcessResult {
   docking_result: DockingResult
 }
 
-interface DockingSchedule {
-  ports: {
-    [key: string]: Array<{
-      mission_id: string
-      start_time: string
-      end_time: string
-      team: string
-    }>
-  }
-}
-
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [processResult, setProcessResult] = useState<ProcessResult | null>(null)
   const [processLoading, setProcessLoading] = useState(false)
   const [processError, setProcessError] = useState('')
-  const [schedule, setSchedule] = useState<DockingSchedule | null>(null)
-  const [scheduleLoading, setScheduleLoading] = useState(false)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -81,25 +70,12 @@ function App() {
       }
 
       setProcessResult(data)
-      // Automatically fetch updated schedule after processing
-      await fetchSchedule()
+      // Trigger calendar refresh after processing
+      setRefreshTrigger(prev => prev + 1)
     } catch (err) {
       setProcessError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setProcessLoading(false)
-    }
-  }
-
-  const fetchSchedule = async () => {
-    setScheduleLoading(true)
-    try {
-      const response = await fetch('/api/docking-status')
-      const data = await response.json()
-      setSchedule(data)
-    } catch (err) {
-      console.error('Failed to fetch schedule:', err)
-    } finally {
-      setScheduleLoading(false)
     }
   }
 
@@ -185,41 +161,11 @@ function App() {
             </div>
           </div>
         )}
+      </div>
 
-        {/* Docking Schedule */}
-        {schedule && (
-          <div className="output-section">
-            <h2>Current Docking Schedule</h2>
-            <button onClick={fetchSchedule} disabled={scheduleLoading} className="refresh-btn">
-              {scheduleLoading ? 'Refreshing...' : 'Refresh Schedule'}
-            </button>
-
-            <div className="schedule-grid">
-              {Object.entries(schedule.ports).map(([port, missions]) => (
-                <div key={port} className="port-schedule">
-                  <h3>Port {port}</h3>
-                  {missions.length === 0 ? (
-                    <p className="empty-port">No missions scheduled</p>
-                  ) : (
-                    <div className="missions-list">
-                      {missions.map((mission, idx) => (
-                        <div key={idx} className="mission-card">
-                          <div><strong>{mission.mission_id}</strong></div>
-                          <div className="mission-time">
-                            {new Date(mission.start_time).toLocaleString()}
-                            {' → '}
-                            {new Date(mission.end_time).toLocaleString()}
-                          </div>
-                          <div className="mission-team">Team: {mission.team}</div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+      {/* Docking Schedule - Separate Section */}
+      <div className="schedule-section">
+        <DockingCalendar refreshTrigger={refreshTrigger} />
       </div>
     </div>
   )
