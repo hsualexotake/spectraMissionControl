@@ -1,81 +1,135 @@
 import { useState } from 'react'
 import './App.css'
 
-function App() {
-  const [inputText, setInputText] = useState('')
-  const [summary, setSummary] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+interface ParseResult {
+  filename: string
+  data: {
+    mission_id: string
+    requested_port: string
+    start_time: string
+    end_time: string
+    team: string
+    refueling_required: boolean
+  }
+}
 
-  const handleSummarize = async () => {
-    if (!inputText.trim()) {
-      setError('Please enter some text to summarize')
+function App() {
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [parseResults, setParseResults] = useState<ParseResult[]>([])
+  const [parseLoading, setParseLoading] = useState(false)
+  const [parseError, setParseError] = useState('')
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files) {
+      setSelectedFiles(Array.from(files))
+      setParseError('')
+      setParseResults([])
+    }
+  }
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleParse = async () => {
+    if (selectedFiles.length === 0) {
+      setParseError('Please select at least one file to parse')
       return
     }
 
-    setLoading(true)
-    setError('')
-    setSummary('')
+    setParseLoading(true)
+    setParseError('')
+    setParseResults([])
 
     try {
-      const response = await fetch('/api/agent', {
+      const formData = new FormData()
+      selectedFiles.forEach(file => {
+        formData.append('files', file)
+      })
+
+      const response = await fetch('/api/parse-logs', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: inputText }),
+        body: formData,
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.details || data.error || 'Failed to summarize text')
+        throw new Error(data.error || 'Failed to parse files')
       }
 
-      setSummary(data.message)
+      setParseResults(data.results)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setParseError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
-      setLoading(false)
+      setParseLoading(false)
     }
   }
 
   return (
     <div className="app">
-      <h1>Text Summarization Demo</h1>
-      <p className="subtitle">Using LangChain + OpenAI</p>
+      <h1>Mission Log Parser</h1>
+      <p className="subtitle">Upload log files to extract structured mission data</p>
 
       <div className="container">
         <div className="input-section">
-          <label htmlFor="input-text">Enter text to summarize:</label>
-          <textarea
-            id="input-text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Paste or type text here..."
-            rows={8}
+          <label htmlFor="file-input">Select log files (.txt, .pdf, .csv):</label>
+          <input
+            id="file-input"
+            type="file"
+            onChange={handleFileChange}
+            accept=".txt,.pdf,.csv"
+            multiple
+            className="file-input"
           />
         </div>
 
-        <button
-          onClick={handleSummarize}
-          disabled={loading || !inputText.trim()}
-          className="summarize-btn"
-        >
-          {loading ? 'Summarizing...' : 'Summarize'}
-        </button>
-
-        {error && (
-          <div className="error">
-            <strong>Error:</strong> {error}
+        {selectedFiles.length > 0 && (
+          <div className="file-list">
+            <label>Selected files:</label>
+            {selectedFiles.map((file, index) => (
+              <div key={index} className="file-item">
+                <span className="file-name">{file.name}</span>
+                <span className="file-size">({(file.size / 1024).toFixed(2)} KB)</span>
+                <button
+                  onClick={() => removeFile(index)}
+                  className="remove-btn"
+                  type="button"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
           </div>
         )}
 
-        {summary && (
+        <button
+          onClick={handleParse}
+          disabled={parseLoading || selectedFiles.length === 0}
+          className="summarize-btn"
+        >
+          {parseLoading ? 'Parsing...' : 'Parse Files'}
+        </button>
+
+        {parseError && (
+          <div className="error">
+            <strong>Error:</strong> {parseError}
+          </div>
+        )}
+
+        {parseResults.length > 0 && (
           <div className="output-section">
-            <label>Summary:</label>
-            <div className="summary-box">
-              {summary}
+            <label>Parsed Results:</label>
+            <div className="results-grid">
+              {parseResults.map((result, index) => (
+                <div key={index} className="result-item">
+                  <h3 className="result-filename">{result.filename}</h3>
+                  <pre className="json-output">
+                    {JSON.stringify(result.data, null, 2)}
+                  </pre>
+                </div>
+              ))}
             </div>
           </div>
         )}
