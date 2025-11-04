@@ -1,21 +1,24 @@
 # Spectra Mission Control
 
-A simple full-stack application with Flask/Python backend and TypeScript/React frontend, featuring LangChain AI agents.
+Space station mission control application for managing spacecraft docking schedules. Upload mission logs (txt, pdf, csv) to automatically parse and schedule docking operations.
 
 ## Project Structure
 
 ```
 spectraMissionControl/
-├── backend/              # Flask Python backend
-│   ├── agents/          # AI agents
-│   │   ├── __init__.py
-│   │   └── demo_agent.py    # Text summarization demo
-│   ├── app.py           # Main Flask application
-│   ├── requirements.txt # Python dependencies
-│   └── .env.example     # Environment variables template
-└── frontend/            # Vite React TypeScript frontend
+├── backend/
+│   ├── agents/
+│   │   └── parse_agent.py      # AI agent for parsing mission logs
+│   ├── app.py                  # Main Flask application
+│   ├── docking_logic.py        # Docking scheduling logic
+│   ├── docking_validation.py   # Validation rules
+│   ├── docking_rules.py        # Port definitions
+│   ├── nasa_scraper.py         # NASA blog scraper
+│   ├── requirements.txt
+│   └── .env.example
+└── frontend/                   # Vite React TypeScript
     ├── src/
-    │   ├── App.tsx      # Main app component
+    │   ├── App.tsx
     │   └── ...
     └── package.json
 ```
@@ -45,13 +48,20 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-5. Add your OpenAI API key to the `.env` file:
+5. Add your API keys to the `.env` file:
 ```
 OPENAI_API_KEY=your_openai_api_key_here
+BROWSERBASE_API_KEY=your_browserbase_api_key_here
+BROWSERBASE_PROJECT_ID=your_browserbase_project_id_here
 PORT=8000
 ```
 
-6. Run the backend server:
+6. Install Playwright browsers (for scraper):
+```bash
+playwright install chromium
+```
+
+7. Run the backend server:
 ```bash
 python app.py
 ```
@@ -79,19 +89,33 @@ The frontend will run on `http://localhost:5173`
 
 ## Usage
 
+### Mission Scheduling
 1. Start both the backend and frontend servers
 2. Open your browser to `http://localhost:5173`
-3. Enter text in the textarea and click "Summarize" to test the demo agent
+3. Upload a mission log file (txt, pdf, or csv)
+4. AI parses the file and schedules docking automatically
+5. View docking schedule in calendar view
+
+### NASA Scraper
+Run the scraper to collect mission data from NASA blog posts:
+```bash
+cd backend
+python nasa_scraper.py
+```
+Results saved to `backend/output/nasa_mission_data.json`
 
 ## API Endpoints
 
-- `GET /api/health` - Health check endpoint
-- `POST /api/agent` - Text summarization endpoint
-  - Request body: `{ "message": "text to summarize" }`
-  - Response: `{ "message": "summary", "note": "Demo agent - Summarized by ChatGPT" }`
+- `GET /api/health` - Health check
+- `POST /api/process-mission` - Upload and process mission log file
+  - Accepts: .txt, .pdf, .csv files
+  - Returns: Parsed mission data and docking result
+- `GET /api/docking-status` - Get current docking schedule
+- `POST /api/clear-schedule` - Clear all scheduled missions
 
 ## Tech Stack
 
-- **Backend**: Flask, LangChain, OpenAI
+- **Backend**: Flask, LangChain, OpenAI, PyPDF2
 - **Frontend**: React, TypeScript, Vite
-- **AI**: LangChain with OpenAI GPT-3.5-turbo
+- **Scraper**: Browserbase, Playwright
+- **AI**: LangChain with OpenAI for mission log parsing
